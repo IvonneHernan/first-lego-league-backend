@@ -24,21 +24,9 @@ public class ProjectRoomController {
 	}
 
 	@PostMapping("/assign-judge")
-	public ResponseEntity<?> assignJudge(@RequestBody AssignJudgeRequest request) {
-		try {
-			AssignJudgeResponse response = projectRoomAssignmentService.assignJudge(request);
-			return ResponseEntity.ok(response);
-		} catch (Exception e) {
-			Map<String, String> errorBody = new HashMap<>();
-			if (e instanceof RoomAssignmentException) {
-				errorBody.put("error", ((RoomAssignmentException) e).getError());
-				errorBody.put("message", e.getMessage());
-			} else {
-				errorBody.put("error", "SERVER_ERROR");
-				errorBody.put("message", e.getMessage());
-			}
-			return ResponseEntity.status(400).body(errorBody);
-		}
+	public ResponseEntity<AssignJudgeResponse> assignJudge(@RequestBody AssignJudgeRequest request) {
+		AssignJudgeResponse response = projectRoomAssignmentService.assignJudge(request);
+		return ResponseEntity.ok(response);
 	}
 
 	@ExceptionHandler(RoomAssignmentException.class)
@@ -47,5 +35,13 @@ public class ProjectRoomController {
 		error.put("error", e.getError());
 		error.put("message", e.getMessage());
 		return ResponseEntity.badRequest().body(error);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<Map<String, String>> handleUnexpectedException(Exception e) {
+		Map<String, String> error = new HashMap<>();
+		error.put("error", "SERVER_ERROR");
+		error.put("message", "Internal server error");
+		return ResponseEntity.internalServerError().body(error);
 	}
 }

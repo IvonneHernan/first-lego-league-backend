@@ -206,12 +206,13 @@ class MatchAssignmentServiceTest {
 				.thenReturn(List.of());
 		when(matchRepository.findOverlappingAssignments(referee, matchB.getStartTime(), matchB.getEndTime(), 11L))
 				.thenReturn(List.of());
+		List<BatchMatchAssignmentItemRequest> assignments = List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"),
+				new BatchMatchAssignmentItemRequest("11", "20"));
 
 		MatchAssignmentException ex = assertThrows(
 				MatchAssignmentException.class,
-				() -> service.assignBatch("3", List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"),
-						new BatchMatchAssignmentItemRequest("11", "20"))));
+				() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.AVAILABILITY_CONFLICT, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -236,12 +237,13 @@ class MatchAssignmentServiceTest {
 		when(volunteerRepository.findByIdForUpdate(21L)).thenReturn(Optional.of(floater));
 		when(matchRepository.findOverlappingAssignments(referee, matchA.getStartTime(), matchA.getEndTime(), 10L))
 				.thenReturn(List.of());
+		List<BatchMatchAssignmentItemRequest> assignments = List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"),
+				new BatchMatchAssignmentItemRequest("11", "21"));
 
 		MatchAssignmentException ex = assertThrows(
 				MatchAssignmentException.class,
-				() -> service.assignBatch("3", List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"),
-						new BatchMatchAssignmentItemRequest("11", "21"))));
+				() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ROLE, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -251,11 +253,12 @@ class MatchAssignmentServiceTest {
 	@Test
 	void assignBatchFailsWhenItemIdFormatIsInvalid() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.of(buildRound(3L)));
+		List<BatchMatchAssignmentItemRequest> assignments = List.of(
+				new BatchMatchAssignmentItemRequest("not-a-number", "20"));
 
 		MatchAssignmentException ex = assertThrows(
 				MatchAssignmentException.class,
-				() -> service.assignBatch("3", List.of(
-						new BatchMatchAssignmentItemRequest("not-a-number", "20"))));
+				() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.INVALID_ID_FORMAT, ex.getErrorCode());
 		assertEquals(0, ex.getIndex());
@@ -265,12 +268,13 @@ class MatchAssignmentServiceTest {
 	@Test
 	void assignBatchFailsWhenMatchIdAppearsTwiceInPayload() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.of(buildRound(3L)));
+		List<BatchMatchAssignmentItemRequest> assignments = List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"),
+				new BatchMatchAssignmentItemRequest("10", "21"));
 
 		MatchAssignmentException ex = assertThrows(
 				MatchAssignmentException.class,
-				() -> service.assignBatch("3", List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"),
-						new BatchMatchAssignmentItemRequest("10", "21"))));
+				() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.DUPLICATE_MATCH_IN_BATCH, ex.getErrorCode());
 		assertEquals(1, ex.getIndex());
@@ -280,11 +284,12 @@ class MatchAssignmentServiceTest {
 	@Test
 	void assignBatchFailsWhenRoundDoesNotExist() {
 		when(roundRepository.findById(3L)).thenReturn(Optional.empty());
+		List<BatchMatchAssignmentItemRequest> assignments = List.of(
+				new BatchMatchAssignmentItemRequest("10", "20"));
 
 		MatchAssignmentException ex = assertThrows(
 				MatchAssignmentException.class,
-				() -> service.assignBatch("3", List.of(
-						new BatchMatchAssignmentItemRequest("10", "20"))));
+				() -> service.assignBatch("3", assignments));
 
 		assertEquals(MatchAssignmentErrorCode.ROUND_NOT_FOUND, ex.getErrorCode());
 		verify(matchRepository, never()).saveAll(any());

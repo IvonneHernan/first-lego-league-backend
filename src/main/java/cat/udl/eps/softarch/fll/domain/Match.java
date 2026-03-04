@@ -2,7 +2,6 @@ package cat.udl.eps.softarch.fll.domain;
 
 import java.time.LocalTime;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -34,6 +33,7 @@ public class Match extends UriEntity<Long> {
 	private LocalTime startTime;
 	private LocalTime endTime;
 
+	@Enumerated(EnumType.STRING)
 	private String state;
 
 	@ManyToOne(fetch = FetchType.LAZY)

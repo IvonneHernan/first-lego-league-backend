@@ -4,7 +4,6 @@ import cat.udl.eps.softarch.fll.domain.Coach;
 import cat.udl.eps.softarch.fll.domain.Team;
 import cat.udl.eps.softarch.fll.repository.CoachRepository;
 import cat.udl.eps.softarch.fll.repository.TeamRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -24,7 +23,6 @@ public class AssignCoachStepDefs {
 	private final StepDefs stepDefs;
 	private final TeamRepository teamRepository;
 	private final CoachRepository coachRepository;
-	private final ObjectMapper mapper;
 
 	private final Map<String, String> teamIdMap = new HashMap<>();
 	private final Map<Integer, Integer> coachIdMap = new HashMap<>();
@@ -35,7 +33,6 @@ public class AssignCoachStepDefs {
 		this.stepDefs = stepDefs;
 		this.teamRepository = teamRepository;
 		this.coachRepository = coachRepository;
-		this.mapper = new ObjectMapper();
 
 	}
 

@@ -2,27 +2,12 @@ package cat.udl.eps.softarch.fll.domain;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DomainValidationTest {
-
-	@Nested
-	class RequireNonNullId {
-
-		@Test
-		void acceptsNonNull() {
-			assertDoesNotThrow(() -> DomainValidation.requireNonNull("abc", "id"));
-		}
-
-		@Test
-		void rejectsNull() {
-			DomainValidationException ex = assertThrows(DomainValidationException.class,
-				() -> DomainValidation.requireNonNull(null, "id"));
-			assertEquals("id must not be null", ex.getMessage());
-		}
-	}
 
 	@Nested
 	class RequireNonBlank {
@@ -82,6 +67,29 @@ class DomainValidationTest {
 			assertThrows(DomainValidationException.class,
 				() -> DomainValidation.requireValidEmail("userexample.com", "email"));
 		}
+
+		@Test
+		void rejectsLeadingDotInLocalPart() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireValidEmail(".user@example.com", "email"));
+		}
+
+		@Test
+		void rejectsTrailingDotInLocalPart() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireValidEmail("user.@example.com", "email"));
+		}
+
+		@Test
+		void rejectsConsecutiveDotsInLocalPart() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireValidEmail("us..er@example.com", "email"));
+		}
+
+		@Test
+		void acceptsLocalPartWithSingleDot() {
+			assertDoesNotThrow(() -> DomainValidation.requireValidEmail("first.last@example.com", "email"));
+		}
 	}
 
 	@Nested
@@ -116,14 +124,140 @@ class DomainValidationTest {
 
 		@Test
 		void acceptsNonNull() {
-			assertDoesNotThrow(() -> DomainValidation.requireNonNull("value", "field"));
+			assertDoesNotThrow(() -> DomainValidation.requireNonNull("abc", "id"));
 		}
 
 		@Test
 		void rejectsNull() {
 			DomainValidationException ex = assertThrows(DomainValidationException.class,
-				() -> DomainValidation.requireNonNull(null, "field"));
-			assertEquals("field must not be null", ex.getMessage());
+				() -> DomainValidation.requireNonNull(null, "id"));
+			assertEquals("id must not be null", ex.getMessage());
+		}
+	}
+
+	@Nested
+	class RequireMin {
+
+		@Test
+		void acceptsValueAtMinimum() {
+			assertDoesNotThrow(() -> DomainValidation.requireMin(5, 5, "age"));
+		}
+
+		@Test
+		void acceptsValueAboveMinimum() {
+			assertDoesNotThrow(() -> DomainValidation.requireMin(10, 5, "age"));
+		}
+
+		@Test
+		void rejectsNull() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireMin(null, 5, "age"));
+		}
+
+		@Test
+		void rejectsBelowMinimum() {
+			DomainValidationException ex = assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireMin(4, 5, "age"));
+			assertEquals("age must not be less than 5", ex.getMessage());
+		}
+	}
+
+	@Nested
+	class RequirePast {
+
+		@Test
+		void acceptsDateInThePast() {
+			assertDoesNotThrow(() -> DomainValidation.requirePast(LocalDate.now().minusDays(1), "birthDate"));
+		}
+
+		@Test
+		void rejectsNull() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requirePast(null, "birthDate"));
+		}
+
+		@Test
+		void rejectsToday() {
+			DomainValidationException ex = assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requirePast(LocalDate.now(), "birthDate"));
+			assertEquals("birthDate must be in the past", ex.getMessage());
+		}
+
+		@Test
+		void rejectsFutureDate() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requirePast(LocalDate.now().plusDays(1), "birthDate"));
+		}
+	}
+
+	@Nested
+	class RequireLengthBetween {
+
+		@Test
+		void acceptsLengthAtMinimum() {
+			assertDoesNotThrow(() -> DomainValidation.requireLengthBetween("ab", 2, 5, "code"));
+		}
+
+		@Test
+		void acceptsLengthAtMaximum() {
+			assertDoesNotThrow(() -> DomainValidation.requireLengthBetween("abcde", 2, 5, "code"));
+		}
+
+		@Test
+		void acceptsLengthWithinBounds() {
+			assertDoesNotThrow(() -> DomainValidation.requireLengthBetween("abc", 2, 5, "code"));
+		}
+
+		@Test
+		void rejectsNull() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireLengthBetween(null, 2, 5, "code"));
+		}
+
+		@Test
+		void rejectsBelowMinimum() {
+			DomainValidationException ex = assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireLengthBetween("a", 2, 5, "code"));
+			assertEquals("code length must not be less than 2", ex.getMessage());
+		}
+
+		@Test
+		void rejectsAboveMaximum() {
+			DomainValidationException ex = assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireLengthBetween("abcdef", 2, 5, "code"));
+			assertEquals("code length must not be more than 5", ex.getMessage());
+		}
+	}
+
+	@Nested
+	class RequireMaxLength {
+
+		@Test
+		void acceptsLengthAtMaximum() {
+			assertDoesNotThrow(() -> DomainValidation.requireMaxLength("abcde", 5, "name"));
+		}
+
+		@Test
+		void acceptsLengthBelowMaximum() {
+			assertDoesNotThrow(() -> DomainValidation.requireMaxLength("abc", 5, "name"));
+		}
+
+		@Test
+		void acceptsEmptyString() {
+			assertDoesNotThrow(() -> DomainValidation.requireMaxLength("", 5, "name"));
+		}
+
+		@Test
+		void rejectsNull() {
+			assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireMaxLength(null, 5, "name"));
+		}
+
+		@Test
+		void rejectsAboveMaximum() {
+			DomainValidationException ex = assertThrows(DomainValidationException.class,
+				() -> DomainValidation.requireMaxLength("abcdef", 5, "name"));
+			assertEquals("name length must not be more than 5", ex.getMessage());
 		}
 	}
 }

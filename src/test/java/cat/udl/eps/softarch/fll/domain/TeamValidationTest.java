@@ -19,7 +19,7 @@ class TeamValidationTest {
 	}
 
 	@Nested
-	class NullId {
+	class NullName {
 
 		@Test
 		void nullNameThrows() {

@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.stereotype.Repository;
+import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.Referee;
 import jakarta.persistence.LockModeType;
@@ -27,6 +28,20 @@ public interface MatchRepository extends CrudRepository<Match, Long>, PagingAndS
 			""")
 	List<Match> findOverlappingAssignments(
 			@Param("referee") Referee referee,
+			@Param("newMatchStartTime") LocalTime newMatchStartTime,
+			@Param("newMatchEndTime") LocalTime newMatchEndTime,
+			@Param("currentMatchId") Long currentMatchId);
+
+	@Query("""
+			SELECT COUNT(m) > 0 FROM Match m
+			WHERE m.competitionTable = :table
+			AND m.startTime < :newMatchEndTime
+			AND m.endTime > :newMatchStartTime
+			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
+			""")
+	@RestResource(exported = false)
+	boolean existsOverlappingAssignmentsForTable(
+			@Param("table") CompetitionTable table,
 			@Param("newMatchStartTime") LocalTime newMatchStartTime,
 			@Param("newMatchEndTime") LocalTime newMatchEndTime,
 			@Param("currentMatchId") Long currentMatchId);

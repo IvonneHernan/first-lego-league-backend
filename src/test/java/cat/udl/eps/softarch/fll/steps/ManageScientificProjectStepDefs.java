@@ -176,7 +176,7 @@ public class ManageScientificProjectStepDefs {
 	public void iCreateScientificProjectWithInvalidTeamWithValidEdition(Integer score, String comments) throws Exception {
 		latestScientificProjectUri = null;
 		String editionUri = createEdition();
-		String invalidTeamUri = "http://localhost/teams/" + UriUtils.encodePathSegment("UnknownTeam-" + UUID.randomUUID(), StandardCharsets.UTF_8);
+		String invalidTeamUri = "non-existing-" + UUID.randomUUID();
 		stepDefs.result = performCreateProject(score, comments, invalidTeamUri, editionUri);
 		captureLatestProjectUriIfCreated();
 	}
@@ -185,7 +185,7 @@ public class ManageScientificProjectStepDefs {
 	public void iCreateScientificProjectWithInvalidEdition(Integer score, String comments, String teamName) throws Exception {
 		latestScientificProjectUri = null;
 		String teamUri = ensureTeamExists(teamName);
-		String invalidEditionUri = "http://localhost/editions/999999999";
+		String invalidEditionUri = "non-existing-" + UUID.randomUUID();
 		stepDefs.result = performCreateProject(score, comments, teamUri, invalidEditionUri);
 		captureLatestProjectUriIfCreated();
 	}

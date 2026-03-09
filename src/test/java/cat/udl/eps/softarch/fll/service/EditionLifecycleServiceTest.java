@@ -108,6 +108,19 @@ class EditionLifecycleServiceTest {
 	}
 
 	@Test
+	void changeStateShouldTreatNullStateAsDraft() {
+		edition.setState(null);
+		when(editionRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(edition));
+
+		EditionLifecycleService.TransitionResult result = editionLifecycleService.changeState(1L, EditionState.OPEN);
+
+		assertEquals(EditionState.DRAFT, result.previousState());
+		assertEquals(EditionState.OPEN, result.newState());
+		assertEquals(EditionState.OPEN, edition.getState());
+		verify(editionRepository).save(edition);
+	}
+
+	@Test
 	void assertOperationAllowedShouldAllowTeamRegistrationWhenOpen() {
 		edition.setState(EditionState.OPEN);
 

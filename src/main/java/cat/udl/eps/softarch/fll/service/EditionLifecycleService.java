@@ -23,7 +23,7 @@ public class EditionLifecycleService {
 				.orElseThrow(() -> new EditionLifecycleException(
 						"EDITION_NOT_FOUND", "Edition with id " + editionId + " not found"));
 
-		EditionState currentState = edition.getState();
+		EditionState currentState = edition.getState() == null ? EditionState.DRAFT : edition.getState();
 		if (!isValidTransition(currentState, targetState)) {
 			throw new EditionLifecycleException(
 					"INVALID_EDITION_STATE_TRANSITION",

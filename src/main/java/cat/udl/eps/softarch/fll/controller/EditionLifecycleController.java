@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cat.udl.eps.softarch.fll.domain.EditionState;
 import cat.udl.eps.softarch.fll.exception.EditionLifecycleException;
 import cat.udl.eps.softarch.fll.service.EditionLifecycleService;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -50,18 +51,30 @@ public class EditionLifecycleController {
 	}
 
 	private String buildInvalidPayloadMessage(HttpMessageNotReadableException exception) {
-		Throwable cause = exception.getMostSpecificCause();
-		String message = cause != null && cause.getMessage() != null ? cause.getMessage() : exception.getMessage();
-		if (message == null) {
-			return "Invalid request body";
+		Throwable cause = exception;
+		while (cause != null) {
+			if (isInvalidStateValueError(cause)) {
+				return "Invalid state value. Allowed values: " + Arrays.toString(EditionState.values());
+			}
+			cause = cause.getCause();
 		}
-		if (message.contains("EditionState")) {
-			return "Invalid state value. Allowed values: " + Arrays.toString(EditionState.values());
-		}
-		if (message.contains("No content to map")) {
+
+		cause = exception.getMostSpecificCause();
+		if (cause instanceof MismatchedInputException mismatchedInputException
+				&& mismatchedInputException.getMessage() != null
+				&& mismatchedInputException.getMessage().contains("No content to map")) {
 			return "Request body is required";
 		}
-		return message;
+
+		return "Invalid request body";
+	}
+
+	private boolean isInvalidStateValueError(Throwable cause) {
+		String className = cause.getClass().getSimpleName();
+		String message = cause.getMessage();
+		return "InvalidFormatException".equals(className)
+				&& message != null
+				&& message.contains("EditionState");
 	}
 
 	public record ChangeEditionStateRequest(EditionState state) {

@@ -34,7 +34,7 @@ public class EditionTeamRegistrationService {
 		try {
 			editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION);
 		} catch (EditionLifecycleException exception) {
-			throw new EditionTeamRegistrationException(exception.getError(), exception.getMessage());
+			throw new EditionTeamRegistrationException(exception.getError(), exception.getMessage(), exception);
 		}
 
 		Team team = teamRepository.findById(teamId)

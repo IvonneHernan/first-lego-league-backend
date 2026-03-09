@@ -89,4 +89,14 @@ class EditionLifecycleControllerTest {
 				.andExpect(jsonPath("$.error").value("INVALID_EDITION_STATE_REQUEST"))
 				.andExpect(jsonPath("$.message").value("Invalid state value. Allowed values: [DRAFT, OPEN, CLOSED]"));
 	}
+
+	@Test
+	void changeStateShouldReturnStableMessageWhenJsonIsMalformed() throws Exception {
+		mockMvc.perform(patch("/editions/5/state")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"state\":"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.error").value("INVALID_EDITION_STATE_REQUEST"))
+				.andExpect(jsonPath("$.message").value("Invalid request body"));
+	}
 }

@@ -31,7 +31,7 @@ Feature: Register Match Score
     And I login as "score-user-5" with password "password"
     And There is an unfinished match ready for score registration
     When I register a final score of 120 for team A and 95 for team B
-    Then The response code is 422
+    Then The response code is 409
     And The error message is "Match must be finished before registering the result"
 
   Scenario: Register score for match with invalid time range
@@ -39,7 +39,7 @@ Feature: Register Match Score
     And I login as "score-user-6" with password "password"
     And There is a match with invalid time range ready for score registration
     When I register a final score of 120 for team A and 95 for team B
-    Then The response code is 422
+    Then The response code is 409
     And The error message is "Match end time cannot be before start time"
 
   Scenario: Register score when match result already exists

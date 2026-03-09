@@ -57,7 +57,7 @@ public class MatchScoreRegistrationController {
 	public ResponseEntity<ApiErrorResponse> handleInvalidPayload(HttpServletRequest request) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 				.body(ApiErrorResponse.of(
-						MatchScoreRegistrationService.ErrorCode.INVALID_SCORE.name(),
+						"INVALID_SCORE_PAYLOAD",
 						"Invalid score payload",
 						request.getRequestURI()));
 	}

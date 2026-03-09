@@ -30,6 +30,12 @@ Feature: Assign a Judge to a ProjectRoom
 		Then the response status should be 404
 		And the response error should be "JUDGE_NOT_FOUND"
 
+	Scenario: Validation fails when judge id format is invalid
+		Given a project room "ROOM_INVALID" exists
+		When I request to assign judge "abc" to room "ROOM_INVALID" with isManager false
+		Then the response status should be 400
+		And the response error should be "INVALID_JUDGE_ID_FORMAT"
+
 	Scenario: Validation fails when room already has a manager
 		Given a project room "ROOM_4" exists
 		And the room "ROOM_4" already has a manager

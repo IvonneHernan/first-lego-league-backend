@@ -109,6 +109,9 @@ public class AssignCoachStepDefs {
 		};
 
 		stepDefs.result.andExpect(status().is(expectedStatus))
-			.andExpect(jsonPath("$.error").value(error));
+			.andExpect(jsonPath("$.error").value(error))
+			.andExpect(jsonPath("$.message").exists())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.path").value("/teams/assign-coach"));
 	}
 }

@@ -2,6 +2,7 @@ package cat.udl.eps.softarch.fll.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,14 +38,16 @@ public class ProjectRoomController {
 				.body(ApiErrorResponse.of(e.getError(), e.getMessage(), request.getRequestURI()));
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception e, HttpServletRequest request) {
-		return ResponseEntity.internalServerError()
-				.body(ApiErrorResponse.of("SERVER_ERROR", "Internal server error", request.getRequestURI()));
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ApiErrorResponse> handleInvalidRequestBody(HttpMessageNotReadableException exception,
+			HttpServletRequest request) {
+		return ResponseEntity.badRequest()
+				.body(ApiErrorResponse.of("INVALID_ASSIGN_JUDGE_REQUEST", "Invalid request body", request.getRequestURI()));
 	}
 
 	private org.springframework.http.HttpStatus resolveStatus(String error) {
 		return switch (error) {
+			case "INVALID_JUDGE_ID_FORMAT" -> org.springframework.http.HttpStatus.BAD_REQUEST;
 			case "ROOM_NOT_FOUND", "JUDGE_NOT_FOUND" -> org.springframework.http.HttpStatus.NOT_FOUND;
 			case "ROOM_ALREADY_HAS_MANAGER", "MAX_PANELISTS_REACHED", "JUDGE_ALREADY_ASSIGNED" ->
 					org.springframework.http.HttpStatus.CONFLICT;

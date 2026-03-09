@@ -3,18 +3,19 @@ package cat.udl.eps.softarch.fll.controller;
 import cat.udl.eps.softarch.fll.dto.AssignCoachRequest;
 import cat.udl.eps.softarch.fll.dto.AssignCoachResponse;
 import cat.udl.eps.softarch.fll.controller.dto.ApiErrorResponse;
+import cat.udl.eps.softarch.fll.exception.TeamCoachAssignmentException;
 import cat.udl.eps.softarch.fll.service.CoachService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import jakarta.validation.Valid;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/teams")
@@ -31,29 +32,29 @@ public class TeamCoachController {
 		);
 	}
 
-	@ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
-	public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException ex, HttpServletRequest request) {
-		HttpStatus status = ex instanceof NoSuchElementException ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
+	@ExceptionHandler(TeamCoachAssignmentException.class)
+	public ResponseEntity<ApiErrorResponse> handleAssignmentException(
+			TeamCoachAssignmentException ex,
+			HttpServletRequest request) {
+		HttpStatus status = resolveStatus(ex.getErrorCode());
 		return ResponseEntity.status(status)
-			.body(ApiErrorResponse.of(ex.getMessage(), ex.getMessage(), request.getRequestURI()));
+			.body(ApiErrorResponse.of(ex.getErrorCode(), ex.getMessage(), request.getRequestURI()));
 	}
 
-	@ExceptionHandler(IllegalStateException.class)
-	public ResponseEntity<ApiErrorResponse> handleConflict(IllegalStateException ex, HttpServletRequest request) {
-		String msg = ex.getMessage();
-		if ("COACH_ALREADY_ASSIGNED".equals(msg)
-			|| "MAX_COACHES_PER_TEAM_REACHED".equals(msg)
-			|| "MAX_TEAMS_PER_COACH_REACHED".equals(msg)) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-				.body(ApiErrorResponse.of(msg, msg, request.getRequestURI()));
-		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(ApiErrorResponse.of(msg, msg, request.getRequestURI()));
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ApiErrorResponse> handleInvalidRequestBody(
+			HttpMessageNotReadableException exception,
+			HttpServletRequest request) {
+		return ResponseEntity.badRequest()
+			.body(ApiErrorResponse.of("INVALID_ASSIGN_COACH_REQUEST", "Invalid request body", request.getRequestURI()));
 	}
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiErrorResponse> handleUnexpected(Exception ex, HttpServletRequest request) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(ApiErrorResponse.of("INTERNAL_SERVER_ERROR", "Internal server error", request.getRequestURI()));
+	private HttpStatus resolveStatus(String errorCode) {
+		return switch (errorCode) {
+			case "TEAM_NOT_FOUND", "COACH_NOT_FOUND" -> HttpStatus.NOT_FOUND;
+			case "COACH_ALREADY_ASSIGNED", "MAX_COACHES_PER_TEAM_REACHED", "MAX_TEAMS_PER_COACH_REACHED" ->
+				HttpStatus.CONFLICT;
+			default -> HttpStatus.BAD_REQUEST;
+		};
 	}
 }

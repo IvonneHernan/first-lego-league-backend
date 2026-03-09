@@ -17,7 +17,8 @@ public class MatchAssignmentExceptionHandler {
 		HttpStatus status = switch (ex.getErrorCode()) {
 			case ROUND_NOT_FOUND, MATCH_NOT_FOUND, REFEREE_NOT_FOUND -> HttpStatus.NOT_FOUND;
 			case AVAILABILITY_CONFLICT, MATCH_ALREADY_HAS_REFEREE, DUPLICATE_MATCH_IN_BATCH -> HttpStatus.CONFLICT;
-			case INVALID_ROLE, INVALID_MATCH_STATE, INVALID_ID_FORMAT -> HttpStatus.UNPROCESSABLE_ENTITY;
+			case INVALID_ID_FORMAT -> HttpStatus.BAD_REQUEST;
+			case INVALID_ROLE, INVALID_MATCH_STATE -> HttpStatus.UNPROCESSABLE_ENTITY;
 		};
 
 		BatchErrorDetails details = ex.hasBatchDetails()

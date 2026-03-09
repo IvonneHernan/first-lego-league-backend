@@ -6,13 +6,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import cat.udl.eps.softarch.fll.controller.dto.EditionVolunteersResponse;
 import cat.udl.eps.softarch.fll.controller.dto.VolunteerSummaryResponse;
+import cat.udl.eps.softarch.fll.exception.EditionVolunteerException;
 import cat.udl.eps.softarch.fll.service.EditionVolunteerService;
 
 class EditionVolunteerControllerTest {
@@ -46,12 +46,12 @@ class EditionVolunteerControllerTest {
 	@Test
 	void getVolunteersGroupedByTypeReturnsNotFoundWhenEditionDoesNotExist() throws Exception {
 		when(editionVolunteerService.getVolunteersGroupedByType(99L))
-				.thenThrow(new NoSuchElementException("EDITION_NOT_FOUND"));
+				.thenThrow(new EditionVolunteerException("EDITION_NOT_FOUND", "Edition with id 99 not found"));
 
 		mockMvc.perform(get("/editions/99/volunteers"))
 				.andExpect(status().isNotFound())
 				.andExpect(jsonPath("$.error").value("EDITION_NOT_FOUND"))
-				.andExpect(jsonPath("$.message").value("EDITION_NOT_FOUND"))
+				.andExpect(jsonPath("$.message").value("Edition with id 99 not found"))
 				.andExpect(jsonPath("$.timestamp").isNotEmpty())
 				.andExpect(jsonPath("$.path").value("/editions/99/volunteers"));
 	}

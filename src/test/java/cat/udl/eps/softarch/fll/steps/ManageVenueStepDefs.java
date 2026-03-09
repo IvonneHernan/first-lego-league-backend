@@ -2,18 +2,17 @@ package cat.udl.eps.softarch.fll.steps;
 
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -138,21 +137,9 @@ public class ManageVenueStepDefs {
 				.andDo(print());
 	}
 
-	@And("^The venue search response has an embedded venues array$")
-	public void theVenueSearchResponseHasEmbeddedVenuesArray() throws Exception {
-		String responseBody = stepDefs.result.andReturn().getResponse().getContentAsString();
-		JsonNode root = stepDefs.mapper.readTree(responseBody);
-		JsonNode venues = root.path("_embedded").path("venues");
-		assertTrue(venues.isArray(), "_embedded.venues must be a JSON array");
-	}
-
 	@And("^The venue search response should contain (\\d+) venues?$")
 	public void theVenueSearchResponseShouldContainCount(int expectedCount) throws Exception {
-		String responseBody = stepDefs.result.andReturn().getResponse().getContentAsString();
-		JsonNode root = stepDefs.mapper.readTree(responseBody);
-		JsonNode venues = root.path("_embedded").path("venues");
-		assertTrue(venues.isArray(), "_embedded.venues must be a JSON array");
-		assertEquals(expectedCount, venues.size());
+		stepDefs.result.andExpect(jsonPath("$._embedded.venues", hasSize(expectedCount)));
 	}
 
 	@And("^The venue search response should include venue named \"([^\"]*)\"$")
@@ -160,10 +147,9 @@ public class ManageVenueStepDefs {
 		stepDefs.result.andExpect(jsonPath("$._embedded.venues[*].name", hasItem(name)));
 	}
 
-	@And("^Each venue in the search response has id, name, city and self link$")
+	@And("^Each venue in the search response has name, city and self link$")
 	public void eachVenueInSearchResponseHasRequiredFields() throws Exception {
 		stepDefs.result
-				.andExpect(jsonPath("$._embedded.venues[*].id", everyItem(notNullValue())))
 				.andExpect(jsonPath("$._embedded.venues[*].name", everyItem(notNullValue())))
 				.andExpect(jsonPath("$._embedded.venues[*].city", everyItem(notNullValue())))
 				.andExpect(jsonPath("$._embedded.venues[*]._links.self.href", everyItem(notNullValue())));

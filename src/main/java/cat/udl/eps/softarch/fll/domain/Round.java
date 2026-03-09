@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "rounds")
 @Getter
-@Setter
+@Setter(lombok.AccessLevel.NONE)
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class Round extends UriEntity<Long> {

@@ -1,5 +1,9 @@
 package cat.udl.eps.softarch.fll.steps;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import cat.udl.eps.softarch.fll.domain.Judge;
 import cat.udl.eps.softarch.fll.domain.ProjectRoom;
 import cat.udl.eps.softarch.fll.repository.JudgeRepository;
@@ -8,17 +12,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 public class ProjectRoomSteps {
 
@@ -92,8 +90,7 @@ public class ProjectRoomSteps {
 
 		String jsonPayload = String.format(
 				"{\"roomId\": \"%s\", \"judgeId\": \"%s\", \"isManager\": %b}",
-				roomId, judgeId, isManager
-		);
+				roomId, judgeId, isManager);
 
 		stepDefs.result = stepDefs.mockMvc.perform(post("/project-rooms/assign-judge")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +106,7 @@ public class ProjectRoomSteps {
 	@Then("the response role should be {string}")
 	public void the_response_role_should_be(String expectedRole) throws Throwable {
 		stepDefs.result.andExpect(jsonPath("$.role").value(expectedRole))
-					   .andExpect(jsonPath("$.status").value("ASSIGNED"));
+				.andExpect(jsonPath("$.status").value("ASSIGNED"));
 	}
 
 	@Then("the response error should be {string}")

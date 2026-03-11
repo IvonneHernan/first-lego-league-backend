@@ -31,11 +31,11 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @ToString
 @Table(name = "team")
+@NoArgsConstructor(access = lombok.AccessLevel.PUBLIC)
 public class Team extends UriEntity<String> {
 
 	@Override

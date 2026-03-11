@@ -15,7 +15,8 @@ import org.springframework.http.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Random;
+import java.util.random.RandomGenerator;
 
 
 public class ProjectRoomSteps {
@@ -41,7 +42,8 @@ public class ProjectRoomSteps {
 
 	@Given("a judge {string} exists")
 	public void a_judge_exists(String judgeAlias) {
-		Judge judge = Judge.create("Test Judge " + judgeAlias, "judge_" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "123456789");
+		Judge judge = Judge.create("Test Judge " + judgeAlias,
+				"judge_" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "123456789");
 		judge = judgeRepository.save(judge);
 		judgeIdMap.put(judgeAlias, judge.getId());
 	}
@@ -59,7 +61,8 @@ public class ProjectRoomSteps {
 	public void the_room_already_has_panelists(String roomId, int count) {
 		ProjectRoom room = roomRepository.findById(roomId).orElseThrow();
 		for (int i = 0; i < count; i++) {
-			Judge panelist = Judge.create("Panelist " + i, "p" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "111");
+			Judge panelist = Judge.create("Panelist " + i,
+					"p" + Random.from(RandomGenerator.getDefault()).nextFloat() + "@test.com", "111");
 			panelist.setMemberOfRoom(room);
 			judgeRepository.save(panelist);
 		}
@@ -80,14 +83,8 @@ public class ProjectRoomSteps {
 		String judgeId = judgeIdMap.containsKey(judgeAlias) ? String.valueOf(judgeIdMap.get(judgeAlias)) : judgeAlias;
 
 		String jsonPayload = String.format(
-<<<<<<< search-endpoint-TeamMember
 				"{\"roomId\": \"%s\", \"judgeId\": \"%s\", \"isManager\": %b}",
 				roomId, judgeId, isManager);
-=======
-			"{\"roomId\": \"%s\", \"judgeId\": \"%s\", \"isManager\": %b}",
-			roomId, judgeId, isManager
-		);
->>>>>>> main
 
 		stepDefs.result = stepDefs.mockMvc.perform(post("/project-rooms/assign-judge")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -103,11 +100,7 @@ public class ProjectRoomSteps {
 	@Then("the response role should be {string}")
 	public void the_response_role_should_be(String expectedRole) throws Throwable {
 		stepDefs.result.andExpect(jsonPath("$.role").value(expectedRole))
-<<<<<<< search-endpoint-TeamMember
 				.andExpect(jsonPath("$.status").value("ASSIGNED"));
-=======
-			.andExpect(jsonPath("$.status").value("ASSIGNED"));
->>>>>>> main
 	}
 
 	@Then("the response error should be {string}")

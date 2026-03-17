@@ -10,6 +10,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import org.springframework.http.MediaType;
+import com.jayway.jsonpath.JsonPath;
 
 public class ManageCoachStepDefs {
 	private final StepDefs stepDefs;
@@ -43,6 +44,9 @@ public class ManageCoachStepDefs {
 	public void iRetrieveCoach(String email) throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(get("/coaches/search/findByEmailAddress?email={email}", email)
 				.with(AuthenticationStepDefs.authenticate()));
+
+		String content = stepDefs.result.andReturn().getResponse().getContentAsString();
+		lastCoachUri = JsonPath.read(content, "$._links.self.href");
 	}
 
 	@Then("The coach name is {string}")
@@ -52,6 +56,9 @@ public class ManageCoachStepDefs {
 
 	@When("I update the coach {string} with new phone {string}")
 	public void iUpdateCoach(String email, String newPhone) throws Exception {
+
+		iRetrieveCoach(email);
+
 		Map<String, String> payload = new HashMap<>();
 		payload.put("phoneNumber", newPhone);
 
@@ -63,11 +70,17 @@ public class ManageCoachStepDefs {
 
 	@And("The coach {string} has phone {string}")
 	public void verifyCoachPhone(String email, String phone) throws Exception {
+
+		iRetrieveCoach(email);
+
 		stepDefs.result.andExpect(jsonPath("$.phoneNumber", is(phone)));
 	}
 
 	@When("I delete the coach with email {string}")
 	public void iDeleteCoach(String email) throws Exception {
+
+		iRetrieveCoach(email);
+
 		stepDefs.result = stepDefs.mockMvc.perform(delete(lastCoachUri)
 				.with(AuthenticationStepDefs.authenticate()));
 	}

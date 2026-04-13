@@ -15,7 +15,7 @@ import cat.udl.eps.softarch.fll.controller.dto.EditionVolunteersResponse;
 import cat.udl.eps.softarch.fll.controller.dto.VolunteerSummaryResponse;
 import cat.udl.eps.softarch.fll.exception.EditionVolunteerException;
 import cat.udl.eps.softarch.fll.handler.EditionVolunteerExceptionHandler;
-import cat.udl.eps.softarch.fll.service.EditionVolunteerService;
+import cat.udl.eps.softarch.fll.service.volunteer.EditionVolunteerService;
 
 class EditionVolunteerControllerTest {
 

@@ -12,7 +12,7 @@ import cat.udl.eps.softarch.fll.api.dto.AssignJudgeRequest;
 import cat.udl.eps.softarch.fll.api.dto.AssignJudgeResponse;
 import cat.udl.eps.softarch.fll.controller.dto.ApiErrorResponse;
 import cat.udl.eps.softarch.fll.exception.RoomAssignmentException;
-import cat.udl.eps.softarch.fll.service.ProjectRoomAssignmentService;
+import cat.udl.eps.softarch.fll.service.projectroom.ProjectRoomAssignmentService;
 
 @RestController
 @RequestMapping("/project-rooms")

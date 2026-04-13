@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cat.udl.eps.softarch.fll.controller.dto.ApiErrorResponse;
 import cat.udl.eps.softarch.fll.domain.EditionState;
 import cat.udl.eps.softarch.fll.exception.EditionLifecycleException;
-import cat.udl.eps.softarch.fll.service.EditionLifecycleService;
+import cat.udl.eps.softarch.fll.service.edition.EditionLifecycleService;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

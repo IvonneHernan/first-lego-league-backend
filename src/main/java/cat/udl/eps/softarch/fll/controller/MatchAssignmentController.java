@@ -11,7 +11,7 @@ import cat.udl.eps.softarch.fll.controller.dto.BatchMatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.controller.dto.MatchAssignmentRequest;
 import cat.udl.eps.softarch.fll.controller.dto.MatchAssignmentResponse;
 import cat.udl.eps.softarch.fll.domain.Match;
-import cat.udl.eps.softarch.fll.service.MatchAssignmentService;
+import cat.udl.eps.softarch.fll.service.match.MatchAssignmentService;
 import jakarta.validation.Valid;
 
 @RestController

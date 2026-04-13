@@ -18,7 +18,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.server.ResponseStatusException;
 import cat.udl.eps.softarch.fll.controller.dto.LeaderboardItemResponse;
 import cat.udl.eps.softarch.fll.controller.dto.LeaderboardPageResponse;
-import cat.udl.eps.softarch.fll.service.LeaderboardService;
+import cat.udl.eps.softarch.fll.service.leaderboard.LeaderboardService;
 
 class LeaderboardControllerTest {
 

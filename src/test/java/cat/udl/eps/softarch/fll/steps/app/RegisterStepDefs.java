@@ -38,9 +38,28 @@ public class RegisterStepDefs {
 			user.setId(username);
 			user.setPassword(password);
 			user.encodePassword();
+			user.setRoles("ROLE_USER");
 			userRepository.save(user);
 		}
 	}
+
+	@Given("^There is a registered user with username \"([^\"]*)\", password \"([^\"]*)\", email \"([^\"]*)\" and roles \"([^\"]*)\"$")
+	public void thereIsARegisteredUserWithUsernamePasswordEmailAndRoles(
+			String username,
+			String password,
+			String email,
+			String roles) {
+		if (!userRepository.existsById(username)) {
+			User user = new User();
+			user.setEmail(email);
+			user.setId(username);
+			user.setPassword(password);
+			user.setRoles(roles);
+			user.encodePassword();
+			userRepository.save(user);
+		}
+	}
+
 
 	@And("^I can login with username \"([^\"]*)\" and password \"([^\"]*)\"$")
 	public void iCanLoginWithUsernameAndPassword(String username, String password) throws Throwable {
@@ -49,8 +68,8 @@ public class RegisterStepDefs {
 
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get("/identity", username)
-						.accept(MediaType.APPLICATION_JSON)
-						.with(AuthenticationStepDefs.authenticate()))
+					.accept(MediaType.APPLICATION_JSON)
+					.with(AuthenticationStepDefs.authenticate()))
 				.andDo(print())
 				.andExpect(status().isOk());
 	}

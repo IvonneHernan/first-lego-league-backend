@@ -54,6 +54,7 @@ public class EditionTeamRegistrationService {
 
 		team.setEdition(edition);
 		teamRepository.save(team);
+		edition.getTeams().add(team);
 		return edition;
 	}
 }

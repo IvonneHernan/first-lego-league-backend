@@ -23,6 +23,4 @@ public interface TeamRepository extends CrudRepository<Team, String>, PagingAndS
 
 	Optional<Team> findByName(@Param("name") String name);
 
-	boolean existsByIdAndEditionId(String teamName, Long editionId);
-
 }

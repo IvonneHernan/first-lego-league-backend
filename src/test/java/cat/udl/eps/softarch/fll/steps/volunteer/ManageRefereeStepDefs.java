@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
 import cat.udl.eps.softarch.fll.steps.app.AuthenticationStepDefs;
 import cat.udl.eps.softarch.fll.steps.app.StepDefs;
 import org.springframework.http.MediaType;
@@ -19,84 +18,84 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-public class ManageJudgeStepDefs {
+public class ManageRefereeStepDefs {
 
 	private final StepDefs stepDefs;
-	private String currentJudgeUrl;
+	private String currentRefereeUrl;
 
-	public ManageJudgeStepDefs(StepDefs stepDefs) {
+	public ManageRefereeStepDefs(StepDefs stepDefs) {
 		this.stepDefs = stepDefs;
 	}
 
-	@When("I request to create a judge with name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
-	public void i_request_to_create_a_judge(String name, String email, String phone, String expertStr) throws Exception {
+	@When("I request to create a referee with name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
+	public void i_request_to_create_a_referee(String name, String email, String phone, String expertStr) throws Exception {
 		Map<String, Object> body = new HashMap<>();
 		body.put("name", name);
 		body.put("emailAddress", email);
 		body.put("phoneNumber", phone);
 		body.put("expert", Boolean.parseBoolean(expertStr));
 
-		stepDefs.result = stepDefs.mockMvc.perform(post("/judges")
+		stepDefs.result = stepDefs.mockMvc.perform(post("/referees")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(stepDefs.mapper.writeValueAsString(body))
 				.characterEncoding(StandardCharsets.UTF_8)
 				.with(AuthenticationStepDefs.authenticate()));
-		
+
 		saveUrlFromLocationHeader();
 	}
 
-	@Given("a judge exists with name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
-	public void a_judge_exists(String name, String email, String phone, String expertStr) throws Exception {
-		i_request_to_create_a_judge(name, email, phone, expertStr);
+	@Given("a referee exists with name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
+	public void a_referee_exists(String name, String email, String phone, String expertStr) throws Exception {
+		i_request_to_create_a_referee(name, email, phone, expertStr);
 		stepDefs.result.andExpect(status().isCreated());
-		assertNotNull(currentJudgeUrl, "Judge URL (Location header) should not be null after creation");
+		assertNotNull(currentRefereeUrl, "Referee URL (Location header) should not be null after creation");
 	}
 
-	@When("I request to retrieve that judge")
-	public void i_request_to_retrieve_that_judge() throws Exception {
+	@When("I request to retrieve that referee")
+	public void i_request_to_retrieve_that_referee() throws Exception {
 		validateUrlIsPresent();
-		stepDefs.result = stepDefs.mockMvc.perform(get(currentJudgeUrl)
+		stepDefs.result = stepDefs.mockMvc.perform(get(currentRefereeUrl)
 				.with(AuthenticationStepDefs.authenticate()));
 	}
 
-	@When("I request to update the judge name to {string}")
-	public void i_request_to_update_the_judge_name_to(String newName) throws Exception {
+	@When("I request to update the referee name to {string}")
+	public void i_request_to_update_the_referee_name_to(String newName) throws Exception {
 		validateUrlIsPresent();
 		Map<String, Object> body = new HashMap<>();
 		body.put("name", newName);
-		
-		stepDefs.result = stepDefs.mockMvc.perform(patch(currentJudgeUrl)
+
+		stepDefs.result = stepDefs.mockMvc.perform(patch(currentRefereeUrl)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(stepDefs.mapper.writeValueAsString(body))
 				.characterEncoding(StandardCharsets.UTF_8)
 				.with(AuthenticationStepDefs.authenticate()));
 	}
 
-	@When("I request to delete that judge")
-	public void i_request_to_delete_that_judge() throws Exception {
+	@When("I request to delete that referee")
+	public void i_request_to_delete_that_referee() throws Exception {
 		validateUrlIsPresent();
-		stepDefs.result = stepDefs.mockMvc.perform(delete(currentJudgeUrl)
+		stepDefs.result = stepDefs.mockMvc.perform(delete(currentRefereeUrl)
 				.with(AuthenticationStepDefs.authenticate()));
 	}
 
-	@Then("the judge API response status should be {int}")
-	public void the_judge_api_response_status_should_be(int expectedStatus) throws Exception {
+	@Then("the referee API response status should be {int}")
+	public void the_referee_api_response_status_should_be(int expectedStatus) throws Exception {
 		stepDefs.result.andExpect(status().is(expectedStatus));
 	}
 
-	@Then("the judge response should contain name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
-	public void the_judge_response_should_contain(String name, String email, String phone, String expertStr) throws Exception {
+	@Then("the referee response should contain name {string} and emailAddress {string} and phoneNumber {string} and expert {string}")
+	public void the_referee_response_should_contain(String name, String email, String phone, String expertStr) throws Exception {
 		boolean isExpert = Boolean.parseBoolean(expertStr);
-		
+
 		stepDefs.result.andExpect(jsonPath("$.name").value(name))
-					   .andExpect(jsonPath("$.emailAddress").value(email))
-					   .andExpect(jsonPath("$.phoneNumber").value(phone))
-					   .andExpect(jsonPath("$.expert").value(isExpert));
+				.andExpect(jsonPath("$.emailAddress").value(email))
+				.andExpect(jsonPath("$.phoneNumber").value(phone))
+				.andExpect(jsonPath("$.expert").value(isExpert));
 	}
 
 	private void validateUrlIsPresent() {
-		if (currentJudgeUrl == null) {
-			throw new IllegalStateException("Missing currentJudgeUrl. Ensure a judge was successfully created first.");
+		if (currentRefereeUrl == null) {
+			throw new IllegalStateException("Missing currentRefereeUrl. Ensure a referee was successfully created first.");
 		}
 	}
 
@@ -104,7 +103,8 @@ public class ManageJudgeStepDefs {
 		MvcResult res = stepDefs.result.andReturn();
 		String location = res.getResponse().getHeader("Location");
 		if (location != null) {
-			currentJudgeUrl = location;
+			currentRefereeUrl = location;
 		}
 	}
 }
+

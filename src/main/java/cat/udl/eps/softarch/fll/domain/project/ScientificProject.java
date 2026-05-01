@@ -46,6 +46,10 @@ public class ScientificProject extends UriEntity<Long> {
 	@NotBlank
 	private String name;
 
+	@ManyToOne
+	@JoinColumn(name = "project_room_id")
+	private ProjectRoom presentedInRoom;
+
 	public static ScientificProject create(Integer score, String name) {
 		DomainValidation.requireNonNegative(score, "score");
 		DomainValidation.requireNonBlank(name, "name");

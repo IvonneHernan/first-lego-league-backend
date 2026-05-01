@@ -31,4 +31,7 @@ public class ProjectRoom {
 	@OneToMany(mappedBy = "memberOfRoom")
 	private List<Judge> panelists = new ArrayList<>();
 
+	@OneToMany(mappedBy = "presentedInRoom")
+	private List<ScientificProject> projects = new ArrayList<>();
+
 }
